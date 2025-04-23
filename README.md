@@ -9,7 +9,6 @@
 - 👁️ **Lihat Detail**: Tampilkan informasi lengkap sebuah peralatan.
 - ✏️ **Edit Data**: Ubah data peralatan melalui form.
 - 🗑️ **Hapus Data**: Konfirmasi sebelum menghapus data.
-- 📑 **Paginasi**: Menampilkan 10 item per halaman.
 
 ## 🧰 Teknologi yang Digunakan
 
