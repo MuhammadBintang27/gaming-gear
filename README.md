@@ -40,10 +40,10 @@ DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_USER=root
 DB_PASSWORD=your_password
-DB_DATABASE=gaming-gear
+DB_DATABASE=gaming_gear_db
 
 
-Pastikan database gaming-gear sudah dibuat di MySQL:CREATE DATABASE gaming-gear;
+Pastikan database gaming_gear_db sudah dibuat di MySQL:CREATE DATABASE gaming_gear_db;
 
 
 
@@ -54,6 +54,19 @@ adonis migration:run
 
 (Opsional) Isi Data Dummy:Gunakan seeder untuk mengisi tabel gaming_gears dengan data contoh:
 adonis seed --files GamingGearSeeder.js
+
+Atau, masukkan data secara manual melalui MySQL:
+INSERT INTO gaming_gears (name, type, category, price, created_at, updated_at) VALUES
+('Razer DeathAdder V2', 'Mouse', 'Mouse', 59.99, NOW(), NOW()),
+('Logitech G Pro X', 'Keyboard', 'Keyboard', 129.99, NOW(), NOW()),
+('SteelSeries Arctis 7', 'Headset', 'Headset', 149.99, NOW(), NOW()),
+('Dell Alienware 27', 'Monitor', 'Monitor', 499.99, NOW(), NOW()),
+('Sony DualSense', 'Controller', 'Controller', 69.99, NOW(), NOW()),
+('Corsair K95 RGB', 'Keyboard', 'Keyboard', 199.99, NOW(), NOW()),
+('HyperX Cloud II', 'Headset', 'Mouse', 99.99, NOW(), NOW()),
+('ASUS ROG Swift', 'Monitor', 'Headset', 799.99, NOW(), NOW()),
+('Microsoft Xbox Elite', 'Controller', 'Controller', 179.99, NOW(), NOW()),
+('Logitech G502 Hero', 'Mouse', 'Mouse', 49.99, NOW(), NOW());
 
 
 
@@ -69,6 +82,21 @@ Akses Aplikasi:
 Buka http://localhost:3333 di browser untuk melihat daftar peralatan gaming.
 Gunakan link "Add New" di navbar untuk menambah peralatan baru.
 Klik tombol "View", "Edit", atau "Delete" di daftar untuk mengelola peralatan.
+
+
+Autentikasi (Opsional):
+
+Aplikasi menggunakan middleware auth untuk rute /gaming-gears/*.
+Jika Anda belum mengatur autentikasi, nonaktifkan middleware di start/routes.js:Route.resource('gaming-gears', 'GamingGearController')
+  .except(['index'])
+  // .middleware(['auth']) // Komentari baris ini
+
+
+Untuk mengaktifkan autentikasi, jalankan:adonis make:auth
+adonis migration:run
+
+Lalu daftar/login melalui UI autentikasi.
+
 
 
 Struktur Proyek
@@ -119,7 +147,7 @@ Lucid ORM: ORM bawaan AdonisJS untuk berinteraksi dengan database.
 
 Catatan Tambahan
 
-Filter: Filter di halaman utama (/) mendukung kombinasi type. Pilih "All Types" untuk menampilkan semua data.
+Filter: Filter di halaman utama (/) mendukung kombinasi type dan category. Pilih "All Types" atau "All Categories" untuk menampilkan semua data.
 Validasi: Form tambah/edit memiliki validasi untuk memastikan input valid (misalnya, type dan category harus dari daftar yang diizinkan).
 Debugging: Metode show di GamingGearController memiliki log untuk debugging (console.log dan console.error).
 
