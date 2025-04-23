@@ -9,27 +9,23 @@ class GamingGearController {
     return ['Mouse', 'Keyboard', 'Headset', 'Monitor', 'Controller']
   }
 
-  static get allowedCategories() {
-    return this.allowedTypes // Kategori sama dengan tipe
-  }
-
   // GET /gaming-gears
   async index({ request, view }) {
     const type = request.input('type')
-    const category = request.input('category')
-    const page = request.input('page', 1)
+    console.log('Requested Type:', type)
+  
     let query = GamingGear.query()
     if (type) {
       query = query.where('type', type)
     }
-    if (category) {
-      query = query.where('category', category)
-    }
-    const gears = await query.orderBy('id', 'asc').paginate(page, 10)
+    
+    const gears = await query.orderBy('id', 'asc').fetch() // Ambil semua data
+    console.log('Gears:', gears.toJSON())
+  
     return view.render('gaming_gears.index', {
-      gears,
+      gears: gears,// Kirim semua data sebagai array JSON
       types: this.constructor.allowedTypes,
-      categories: this.constructor.allowedCategories
+      selectedType: type || null
     })
   }
 
@@ -37,7 +33,6 @@ class GamingGearController {
   async create({ view }) {
     return view.render('gaming_gears.create', {
       types: this.constructor.allowedTypes,
-      categories: this.constructor.allowedCategories
     })
   }
 
@@ -46,7 +41,6 @@ class GamingGearController {
     const rules = {
       name: 'required|min:2',
       type: `required|in:${this.constructor.allowedTypes.join(',')}`,
-      category: `required|in:${this.constructor.allowedCategories.join(',')}`,
       price: 'required|number|range:0.01,1000000',
     }
 
@@ -55,8 +49,6 @@ class GamingGearController {
       'name.min': 'Name must be at least 2 characters',
       'type.required': 'Type is required',
       'type.in': 'Invalid type selected',
-      'category.required': 'Category is required',
-      'category.in': 'Invalid category selected',
       'price.required': 'Price is required',
       'price.number': 'Price must be a number',
       'price.range': 'Price must be between 0.01 and 1,000,000',
@@ -64,7 +56,7 @@ class GamingGearController {
 
     
 
-    await GamingGear.create(request.only(['name', 'type', 'category', 'price']))
+    await GamingGear.create(request.only(['name', 'type', 'price']))
     session.flash({ success: 'Gaming gear created successfully' })
     return response.redirect('/gaming-gears')
   }
@@ -97,7 +89,6 @@ class GamingGearController {
       return view.render('gaming_gears.edit', {
         gear,
         types: this.constructor.allowedTypes,
-        categories: this.constructor.allowedCategories
       })
     } catch (error) {
       session.flash({ error: 'Gaming gear not found' })
@@ -110,7 +101,6 @@ class GamingGearController {
     const rules = {
       name: 'required|min:2',
       type: `required|in:${this.constructor.allowedTypes.join(',')}`,
-      category: `required|in:${this.constructor.allowedCategories.join(',')}`,
       price: 'required|number|range:0.01,1000000',
     }
 
@@ -119,8 +109,6 @@ class GamingGearController {
       'name.min': 'Name must be at least 2 characters',
       'type.required': 'Type is required',
       'type.in': 'Invalid type selected',
-      'category.required': 'Category is required',
-      'category.in': 'Invalid category selected',
       'price.required': 'Price is required',
       'price.number': 'Price must be a number',
       'price.range': 'Price must be between 0.01 and 1,000,000',
@@ -130,7 +118,7 @@ class GamingGearController {
 
     try {
       const gear = await GamingGear.findOrFail(params.id)
-      gear.merge(request.only(['name', 'type', 'category', 'price']))
+      gear.merge(request.only(['name', 'type', 'price']))
       await gear.save()
       session.flash({ success: 'Gaming gear updated successfully' })
       return response.redirect('/gaming-gears')
